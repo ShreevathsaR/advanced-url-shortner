@@ -7,6 +7,7 @@ const session = require("express-session");
 
 const authRoutes = require("./routes/authRoutes");
 const dashboardRoutes = require("./routes/dashboardRoutes");
+const shortenUrlRoutes = require("./routes/urlRoutes");
 
 dotenv.config();
 
@@ -23,7 +24,7 @@ app.use(
     session({
         secret: process.env.SESSION_SECRET_KEY,
         resave: false,
-        saveUninitialized: false,
+        saveUninitialized: true,
     })
 );
 
@@ -34,6 +35,8 @@ app.use(passport.session());
 
 app.use('/auth', authRoutes);
 app.use(dashboardRoutes);
+app.use(shortenUrlRoutes)
+
 app.get("/", (req, res) => {
   res.send("This works!");
 });
