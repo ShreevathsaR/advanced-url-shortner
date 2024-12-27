@@ -1,5 +1,7 @@
 # Custom URL Shortener API
 
+Deployed app: https://advanced-url-shortner.onrender.com
+
 This project implements a scalable URL shortener API with advanced analytics, user authentication via Google Sign-In, rate limiting, and topic-based grouping of URLs. It provides detailed insights into the performance of shortened URLs and allows users to create, track, and analyze their short links. The solution is dockerized for deployment on a cloud hosting service and designed with scalability in mind.
 
 ## Features
@@ -36,6 +38,10 @@ This project implements a scalable URL shortener API with advanced analytics, us
 ## API Endpoints
 
 ### 1. **POST /shorten**
+Link: https://advanced-url-shortner.onrender.com/shorten
+
+This is a secured route connect.sid (sessionId) has to be added as a value to the Cookie header for this call
+
 - **Description**: Creates a shortened URL for a provided long URL.
 - **Authentication**: Requires Google Sign-In (`isAuthenticated` middleware).
 - **Rate Limiting**: Implemented to restrict the number of short URLs a user can create within a given timeframe (`urlCreationLimiter`).
@@ -45,22 +51,35 @@ This project implements a scalable URL shortener API with advanced analytics, us
   - `topic` (optional): Topic to categorize the URL under (e.g., "acquisition", "retention").
   
 ### 2. **GET /:shortUrl**
+Link: https://advanced-url-shortner.onrender.com/:shortUrl
 - **Description**: Redirects the user to the original long URL using the short URL.
 - **Parameters**: 
   - `shortUrl`: The short URL to redirect to the original URL.
   
 ### 3. **GET /analytics/:shortUrlId**
+Link: https://advanced-url-shortner.onrender.com/analytics/:shortUrlId
+
+This is a secured route connect.sid (sessionId) has to be added as a value to the Cookie header for this call
+
 - **Description**: Retrieves detailed analytics for a specific short URL.
 - **Parameters**:
   - `shortUrlId`: The ID of the shortened URL.
 - **Analytics Data**: Provides insights such as total clicks, unique users, date-wise performance, OS type, and device type.
 
 ### 4. **GET /analytics/topic/:topic**
+Link: https://advanced-url-shortner.onrender.com/topic/:topic
+
+This is a secured route connect.sid (sessionId) has to be added as a value to the Cookie header for this call
+
 - **Description**: Retrieves analytics for URLs grouped under a specific topic.
 - **Parameters**:
   - `topic`: The topic name (e.g., "acquisition", "retention") for which analytics are to be fetched.
   
 ### 5. **GET /overall/analytics**
+Link: https://advanced-url-shortner.onrender.com/overall/analytics
+
+This is a secured route connect.sid (sessionId) has to be added as a value to the Cookie header for this call
+
 - **Description**: Retrieves overall analytics for all URLs created by the authenticated user.
 - **Authentication**: Requires Google Sign-In (`isAuthenticated` middleware).
 - **Analytics Data**: Provides a summary of overall URL performance, including clicks, unique users, and other key metrics.
