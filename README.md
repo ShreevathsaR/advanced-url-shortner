@@ -23,7 +23,7 @@ This project implements a scalable URL shortener API with advanced analytics, us
 - Overall analytics for all URLs created by the user.
 
 ### Rate Limiting
-- Restricts the number of short URLs a user can create within a given timeframe.
+- Restricts the number of short URLs a user can create within a given timeframe using **express-rate limiter**.
 
 ### Caching
 - Implemented caching with **Redis** for better performance and reduced database load.
