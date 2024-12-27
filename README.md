@@ -32,3 +32,35 @@ This project implements a scalable URL shortener API with advanced analytics, us
 
 ### Swagger Documentation
 - Provides detailed API documentation for easy integration and understanding.
+
+## API Endpoints
+
+### 1. **POST /shorten**
+- **Description**: Creates a shortened URL for a provided long URL.
+- **Authentication**: Requires Google Sign-In (`isAuthenticated` middleware).
+- **Rate Limiting**: Implemented to restrict the number of short URLs a user can create within a given timeframe (`urlCreationLimiter`).
+- **Body Parameters**:
+  - `longUrl` (required): The original long URL to shorten.
+  - `alias` (optional): Custom alias for the short URL.
+  - `topic` (optional): Topic to categorize the URL under (e.g., "acquisition", "retention").
+  
+### 2. **GET /:shortUrl**
+- **Description**: Redirects the user to the original long URL using the short URL.
+- **Parameters**: 
+  - `shortUrl`: The short URL to redirect to the original URL.
+  
+### 3. **GET /analytics/:shortUrlId**
+- **Description**: Retrieves detailed analytics for a specific short URL.
+- **Parameters**:
+  - `shortUrlId`: The ID of the shortened URL.
+- **Analytics Data**: Provides insights such as total clicks, unique users, date-wise performance, OS type, and device type.
+
+### 4. **GET /analytics/topic/:topic**
+- **Description**: Retrieves analytics for URLs grouped under a specific topic.
+- **Parameters**:
+  - `topic`: The topic name (e.g., "acquisition", "retention") for which analytics are to be fetched.
+  
+### 5. **GET /overall/analytics**
+- **Description**: Retrieves overall analytics for all URLs created by the authenticated user.
+- **Authentication**: Requires Google Sign-In (`isAuthenticated` middleware).
+- **Analytics Data**: Provides a summary of overall URL performance, including clicks, unique users, and other key metrics.
