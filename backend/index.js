@@ -44,7 +44,7 @@ app.use(dashboardRoutes);
 app.use(shortenUrlRoutes)
 
 app.get("/", (req, res) => {
-  res.send("This works!");
+  res.send("Welcome please change the path to /auth/google to signIn!");
 });
 
 app.listen(process.env.PORT, () => {
