@@ -1,6 +1,8 @@
 # Custom URL Shortener API
 
-Deployed app: https://advanced-url-shortner.onrender.com
+Deployed app: https://advanced-url-shortner.onrender.com (Backend)
+
+There is no frontend for this app even though the folder exists
 
 This project implements a scalable URL shortener API with advanced analytics, user authentication via Google Sign-In, rate limiting, and topic-based grouping of URLs. It provides detailed insights into the performance of shortened URLs and allows users to create, track, and analyze their short links. The solution is dockerized for deployment on a cloud hosting service and designed with scalability in mind.
 
