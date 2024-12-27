@@ -4,12 +4,18 @@ const dotenv = require("dotenv");
 const mongoose = require("mongoose");
 const passport = require("./config/passport");
 const session = require("express-session");
+const cors = require('cors')
+
+app.use(cors())
 
 const authRoutes = require("./routes/authRoutes");
 const dashboardRoutes = require("./routes/dashboardRoutes");
 const shortenUrlRoutes = require("./routes/urlRoutes");
+const { swaggerUi, swaggerSpec } = require("./config/swagger");
 
 dotenv.config();
+
+app.use('/api-docs', swaggerUi.serve, swaggerUi.setup(swaggerSpec));
 
 mongoose
 .connect(process.env.MONGO_URI)

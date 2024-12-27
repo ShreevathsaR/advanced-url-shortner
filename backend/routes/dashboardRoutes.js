@@ -1,6 +1,8 @@
 const router = require("express").Router();
 const { isAuthenticated } = require("../middlewares/authMiddleware");
 
+
+//for testing
 router.get("/dashboard", (req, res) => {
     if (!req.isAuthenticated()) {
       return res.redirect("/");

@@ -5,6 +5,7 @@ const useragent = require("useragent");
 const Analytics = require("../models/Analytics");
 const redisClient = require("../config/redis");
 
+
 const createShortUrl = async (req, res) => {
   const { originalUrl, customAlias, topic } = req.body;
 
@@ -26,7 +27,7 @@ const createShortUrl = async (req, res) => {
       originalUrl,
       customAlias: alias,
       shortUrl: `http://localhost:${process.env.PORT}/${alias}`,
-      userId: "676a42790a6a5a02fd5f9203",
+      userId: req.user._id,
       topic: topic || "",
     });
 
@@ -248,7 +249,10 @@ const getTopicAnalytics = async (req, res) => {
 
 const getOverallAnalytics = async (req, res) => {
   try {
-    const userId = '676a42790a6a5a02fd5f9203'; 
+
+    // console.log(req.user)
+
+    const userId = req.user._id; 
 
     const userUrls = await Url.find({ userId: userId });
 
