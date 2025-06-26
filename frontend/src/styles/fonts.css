@@ -1,0 +1,12 @@
+@font-face {
+  font-family: 'SF-Pro-Regular';
+  src: url('../assets/fonts/SF_Pro/SFPRODISPLAYREGULAR.OTF') format('opentype');
+  font-weight: normal;
+  font-style: normal;
+}
+@font-face {
+  font-family: 'SF-Pro-Bold';
+  src: url('../assets/fonts/SF_Pro/SFPRODISPLAYBOLD.OTF') format('opentype');
+  font-weight: bolder;
+  font-style: normal;
+}

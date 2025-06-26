@@ -62,8 +62,8 @@ router.get(
  *               example: Successfully logged in
  */
 router.get("/google/callback", passport.authenticate("google", {
-  successRedirect: "/dashboard",
-  failureRedirect: "/login",
+  successRedirect: "http://localhost:5173/dashboard",
+  failureRedirect: "http://localhost:5173/login",
 }),
   (req, res) => {
     res.send("Successfully logged in")
@@ -98,9 +98,24 @@ router.get('/logout', (req, res) => {
   req.logout((err) => {
     if (err) {
       console.log(err);
+      res.status(200).json({success: false, message:"User logging out failed"});
+      return
     }
-    res.redirect('/');
+    res.status(200).json({success: true, message:"User logged out successfully"});
   })
 })
 
+router.get('/check', (req, res) => {
+
+  const status = req.isAuthenticated()
+  
+  if(!status){
+    return res.status(401).json({success: false, message: "User not authenticated", isAuthenticated: false})
+  }
+  const user = req.user
+  return res.status(200).json({success: true, message: "User authenticated", isAuthenticated: true, user})
+})
+
+
 module.exports = router;
+

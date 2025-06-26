@@ -5,7 +5,6 @@ const useragent = require("useragent");
 const Analytics = require("../models/Analytics");
 const redisClient = require("../config/redis");
 
-
 const createShortUrl = async (req, res) => {
   const { originalUrl, customAlias, topic } = req.body;
 
@@ -34,20 +33,36 @@ const createShortUrl = async (req, res) => {
     await newUrl.save();
     res
       .status(201)
-      .json({ shortUrl: newUrl.shortUrl, originalUrl: newUrl.originalUrl });
+      .json({ success: true, shortUrl: newUrl.shortUrl, originalUrl: newUrl.originalUrl });
   } catch (err) {
     res.status(500).json({ message: "Server error", error: err.message });
   }
+};
+
+const getAllUrls = async (req, res) => {
+  const userId = req.user._id;
+
+  try {    
+    const userUrls = await Url.find({ userId: userId });
+  
+    if (!userUrls.length) {
+      return res.status(404).json({ success: false, message: "No URLs found for the user." });
+    }
+    return res.status(200).json({success: true, message:"Urls fetched successfuly", data: userUrls})
+  } catch (error) {
+    console.log(error)
+    return res.status(500).json({ success: false, message: "Error fetching urls for the user" });
+  }
+
 };
 
 const redirectShortUrl = async (req, res) => {
   const { shortUrl: alias } = req.params;
 
   try {
-
     const cachedUrl = await redisClient.get(`shortUrl:${alias}`);
     if (cachedUrl) {
-      console.log('Cache hit');
+      console.log("Cache hit");
       return res.redirect(cachedUrl);
     }
 
@@ -86,17 +101,17 @@ const redirectShortUrl = async (req, res) => {
 const getAnalyticsData = async (req, res) => {
   const { shortUrlId } = req.params;
   try {
-
     const cachedAnalytics = await redisClient.get(`analytics:${shortUrlId}`);
     if (cachedAnalytics) {
-      console.log('Cache hit');
+      console.log("Cache hit");
       return res.json(JSON.parse(cachedAnalytics));
     }
 
-
     const records = await Analytics.find({ shortUrlId: shortUrlId });
 
-    await redisClient.set(`analytics:${shortUrlId}`, JSON.stringify(records), { EX: 3600 });
+    await redisClient.set(`analytics:${shortUrlId}`, JSON.stringify(records), {
+      EX: 3600,
+    });
 
     if (!records) {
       return res
@@ -249,10 +264,9 @@ const getTopicAnalytics = async (req, res) => {
 
 const getOverallAnalytics = async (req, res) => {
   try {
-
     // console.log(req.user)
 
-    const userId = req.user._id; 
+    const userId = req.user._id;
 
     const userUrls = await Url.find({ userId: userId });
 
@@ -262,22 +276,17 @@ const getOverallAnalytics = async (req, res) => {
 
     const shortUrlIds = userUrls.map((url) => url._id);
 
-
     const analyticsRecords = await Analytics.find({
       shortUrlId: { $in: shortUrlIds },
     });
 
-
     const totalUrls = userUrls.length;
 
-
     const totalClicks = analyticsRecords.length;
-
 
     const uniqueUsers = new Set(
       analyticsRecords.map((record) => record.ipAddress)
     ).size;
-
 
     const sevenDaysAgo = new Date();
     sevenDaysAgo.setDate(sevenDaysAgo.getDate() - 7);
@@ -288,7 +297,6 @@ const getOverallAnalytics = async (req, res) => {
         acc[date] = (acc[date] || 0) + 1;
         return acc;
       }, {});
-
 
     const osType = analyticsRecords.reduce((acc, record) => {
       acc[record.osType] = acc[record.osType] || {
@@ -343,5 +351,6 @@ module.exports = {
   createShortUrl,
   getAnalyticsData,
   getTopicAnalytics,
-  getOverallAnalytics
+  getOverallAnalytics,
+  getAllUrls
 };
