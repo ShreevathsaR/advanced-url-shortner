@@ -2,7 +2,7 @@ import GoogleButton from "react-google-button";
 
 const Login = () => {
   const handleLogin = () => {
-    window.location.href = "http://localhost:8000/auth/google";
+    window.location.href = "https://advanced-url-shortner-a47f.onrender.com/auth/google";
   };
   return (
     <>

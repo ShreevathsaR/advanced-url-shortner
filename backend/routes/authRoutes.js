@@ -62,8 +62,8 @@ router.get(
  *               example: Successfully logged in
  */
 router.get("/google/callback", passport.authenticate("google", {
-  successRedirect: "http://localhost:5173/dashboard",
-  failureRedirect: "http://localhost:5173/login",
+  successRedirect: "https://url-shortner.vathsa.site/dashboard",
+  failureRedirect: "https://url-shortner.vathsa.site/login",
 }),
   (req, res) => {
     res.send("Successfully logged in")

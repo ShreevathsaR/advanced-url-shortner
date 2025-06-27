@@ -26,7 +26,7 @@ const createShortUrl = async (req, res) => {
     const newUrl = new Url({
       originalUrl,
       customAlias: alias,
-      shortUrl: `http://localhost:${process.env.PORT}/${alias}`,
+      shortUrl: `https://advanced-url-shortner-a47f.onrender.com/${alias}`,
       userId: req.user._id,
       topic: topic || "",
     });
