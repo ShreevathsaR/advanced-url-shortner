@@ -2,8 +2,7 @@ import { useEffect, useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Card } from "@/components/ui/card"
 import { UAParser } from "ua-parser-js"
-import { CheckCircle, Zap, Lock, BarChart2, ArrowRight, Sparkles } from "lucide-react"
-import { Input } from "@/components/ui/input"
+import { Zap, Lock, BarChart2, ArrowRight, Sparkles } from "lucide-react"
 import { Label } from "@/components/ui/label"
 import { useNavigate } from "react-router"
 import { api } from "@/lib/baseUrl"
@@ -29,7 +28,6 @@ const features = [
 
 const LandingPage = () => {
   const [analytics, setAnalytics] = useState({ os: "", device: "" })
-  const [url, setUrl] = useState("")
   const [isVisible, setIsVisible] = useState(false)
 
   const [number, setNumber] = useState('')
