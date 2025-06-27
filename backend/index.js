@@ -29,12 +29,18 @@ mongoose
     console.log(err);
 });
 
+app.set('trust proxy', 1); // required on Render for HTTPS
+
 app.use(
-    session({
-        secret: process.env.SESSION_SECRET_KEY,
-        resave: false,
-        saveUninitialized: true,
-    })
+  session({
+    secret: process.env.SESSION_SECRET_KEY,
+    resave: false,
+    saveUninitialized: false,
+    cookie: {
+      secure: true,        // Must be true in production (HTTPS)
+      sameSite: 'None',    // Must be 'None' for cross-site cookies
+    },
+  })
 );
 
 
