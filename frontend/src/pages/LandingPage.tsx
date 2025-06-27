@@ -35,7 +35,7 @@ const LandingPage = () => {
   useEffect(()=>{
   const getNumbers = async () => {
     try {
-      const response = await api.get('/landing/numbers')
+      const response = await api.get('/landing/all')
       if(response.data.success){
         setNumber(response.data.number.toString())
       }
