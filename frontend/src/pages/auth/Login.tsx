@@ -6,8 +6,8 @@ const Login = () => {
   };
   return (
     <>
-      <div>
-        <GoogleButton onClick={handleLogin} />
+      <div className="min-h-screen bg-[#0f0f1a] flex justify-center items-center">
+        <GoogleButton onClick={handleLogin}/>
       </div>
     </>
   );
