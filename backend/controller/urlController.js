@@ -387,6 +387,24 @@ const deleteShortUrl = async (req, res) => {
   }
 };
 
+const getNumbers = async (req, res) => {
+
+  try {
+    const number = await Url.countDocuments();
+
+    return res.status(200).json({
+      success: true,
+      message: "Urls fetched successfuly",
+      number,
+    });
+  } catch (error) {
+    console.log(error);
+    return res
+      .status(500)
+      .json({ success: false, message: "Error fetching numbers" });
+  }
+};
+
 module.exports = {
   redirectShortUrl,
   createShortUrl,
@@ -395,4 +413,5 @@ module.exports = {
   getOverallAnalytics,
   getAllUrls,
   deleteShortUrl,
+  getNumbers
 };
