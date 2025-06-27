@@ -29,7 +29,7 @@ mongoose
     console.log(err);
 });
 
-app.set('trust proxy', 1); // required on Render for HTTPS
+app.set('trust proxy', 1); 
 
 app.use(
   session({
@@ -37,8 +37,8 @@ app.use(
     resave: false,
     saveUninitialized: false,
     cookie: {
-      secure: true,        // Must be true in production (HTTPS)
-      sameSite: 'None',    // Must be 'None' for cross-site cookies
+      secure: true,       
+      sameSite: 'None',   
     },
   })
 );

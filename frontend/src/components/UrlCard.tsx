@@ -50,7 +50,7 @@ export function UrlCard({ showUrlCard, setShowUrlCard, url }: UrlCardProps) {
             <Button
               className="bg-[#e2e2f5] hover:text-[#e2e2f5] hover:cursor-pointer hover:bg-[#5855eb] text-[#0f0f1a] font-[SF-Pro-Bold] px-6 py-2 rounded-lg transition-all duration-200 hover:shadow-lg"
               onClick={() => {
-                navigator.clipboard.writeText(url.originalUrl),
+                navigator.clipboard.writeText(url.shortUrl),
                   toast.success("Link copied to you clipboard");
               }}
             >
