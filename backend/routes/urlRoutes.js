@@ -1,5 +1,5 @@
 const router = require("express").Router();
-const { createShortUrl, redirectShortUrl, getAnalyticsData, getTopicAnalytics, getOverallAnalytics, getAllUrls } = require("../controller/urlController");
+const { createShortUrl, redirectShortUrl, getAnalyticsData, getTopicAnalytics, getOverallAnalytics, getAllUrls, deleteShortUrl } = require("../controller/urlController");
 const {isAuthenticated} = require("../middlewares/authMiddleware");
 const { urlCreationLimiter } = require("../middlewares/rateLimiter");
 const Url = require("../models/Url");
@@ -429,6 +429,7 @@ router.get("/analytics/topic/:topic", getTopicAnalytics);
  */
 router.get("/overall/analytics", isAuthenticated, getOverallAnalytics);
 router.get("/user/urls", isAuthenticated, getAllUrls);
+router.delete("/:urlId", isAuthenticated, deleteShortUrl)
   
 
 module.exports = router;

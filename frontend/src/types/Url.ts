@@ -27,3 +27,10 @@ export interface AllUrls {
   customAlias: string;
   createdAt: Date;
 }
+
+export interface AnalyticsResult{
+  totalClicks: number;
+  uniqueClicks: number;
+  osType: OsTypeObject[];
+  deviceType: DeviceTypeObject[];
+}

@@ -7,14 +7,11 @@ import {
   MousePointer,
   BarChart3,
   TrendingUp,
-  Phone,
   MonitorCheck,
   Link,
 } from "lucide-react";
-import Navbar from "../components/Navbar";
 import { useOverallAnalytics } from "@/hooks/queries/overallAnalytics";
 import { Button } from "@/components/ui/button";
-import { Separator } from "@/components/ui/separator";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import {
   PieChart,
@@ -238,7 +235,7 @@ const Dashboard = () => {
                         fill="#8884d8"
                         dataKey="value"
                       >
-                        {osChartData.map((entry, index) => (
+                        {osChartData.map((index: any) => (
                           <Cell
                             key={`cell-${index}`}
                             fill={COLORS[index % COLORS.length]}

@@ -30,20 +30,49 @@ import { useNavigate } from "react-router";
 import { toast } from "sonner";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { api } from "@/lib/baseUrl";
+import { AxiosError } from "axios";
+import type { ApiResponse } from "@/types/apiResponse";
+import { UrlCard } from "@/components/UrlCard";
+import type { AllUrls } from "@/types/Url";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
-const Urls = () => {
+export default function Urls() {
   const { data: urls, error, isFetching, refetch } = useAllUrls();
   const [originalUrl, setOriginalUrl] = useState("");
   const [customAlias, setCustomAlias] = useState("");
   const [topic, setTopic] = useState("");
+  const [showUrlCard, setShowUrlCard] = useState(false);
+
+  const [open, setOpen] = useState(false);
+  const [url, setUrl] = useState<AllUrls | null>(null);
+
+  const [deleteModal, setDeleteModal] = useState(false);
 
   const navigate = useNavigate();
 
-  if (error) {
-    console.log(error);
-  }
+  useEffect(() => {
+    if (error && (error as AxiosError).isAxiosError) {
+      const axiosError = error as AxiosError;
+      const status = axiosError.response?.status;
+
+      if (status === 401) {
+        navigate("/login");
+      }
+
+      console.log(axiosError);
+    }
+  }, [error, navigate]);
 
   function truncate(str: string, maxLength = 20) {
     return str.length > maxLength ? str.slice(0, maxLength) + "..." : str;
@@ -67,16 +96,38 @@ const Urls = () => {
         toast.success("Success", {
           description: "Short URL created successfully",
         });
-        setTopic('')
-        setCustomAlias('')
-        setOriginalUrl('')
-        //TODO Close Dialog
+        setOpen(false);
+        setTopic("");
+        setCustomAlias("");
+        setOriginalUrl("");
+        refetch();
         return;
       }
       toast.error("Error creating URL");
     } catch (error) {
-      console.log(error);
-      toast.error("Error creating URL");
+      const axiosError = error as AxiosError<ApiResponse>;
+      console.log(axiosError);
+      toast.error("Error creating URL", {
+        description: axiosError.response?.data.message,
+      });
+    }
+  };
+
+  const handleItemClick = (url: AllUrls) => {
+    setUrl(url);
+    setShowUrlCard(true);
+  };
+
+  const handleDeleteUrl = async (urlId: any) => {
+    try {
+      const response = await api.delete(`/${urlId}`, { withCredentials: true });
+      if (response.data.success) {
+        toast.success(response.data.message);
+      }
+      refetch();
+    } catch (error) {
+      const axiosError = error as AxiosError<ApiResponse>;
+      console.log(axiosError.response?.data.message);
     }
   };
 
@@ -92,20 +143,33 @@ const Urls = () => {
           </div>
         </div>
       )}
+      {showUrlCard && (
+        <div className="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 flex items-center justify-center">
+          <div className="bg-[#1a1a2e] p-6 rounded-lg border border-[#303052]">
+            {url && (
+              <UrlCard
+                showUrlCard={showUrlCard}
+                url={url}
+                setShowUrlCard={setShowUrlCard}
+              />
+            )}
+          </div>
+        </div>
+      )}
       <div className="flex justify-between w-full p-10">
         <h1 className="text-4xl text-white font-[SF-Pro-Bold]">
           Your all URLs
         </h1>
         <div className="gap-5 flex">
           <Button
-            onClick={() => navigate("/dashboard")}
+            onClick={() => navigate("/dashboard", { replace: true })}
             className="bg-[#e2e2f5] hover:text-[#e2e2f5] hover:cursor-pointer hover:bg-[#5855eb] text-[#0f0f1a] font-[SF-Pro-Bold] px-6 py-2 rounded-lg transition-all duration-200 hover:shadow-lg"
           >
             <BarChart className="h-4 w-4 mr-2" />
             Dashboard
           </Button>
-          <Dialog>
-            <DialogTrigger className="flex items-center bg-[#e2e2f5] hover:text-[#e2e2f5] hover:cursor-pointer hover:bg-[#5855eb] text-[#0f0f1a] font-[SF-Pro-Bold] px-4 rounded-lg transition-all duration-200 hover:shadow-lg">
+          <Dialog open={open} onOpenChange={setOpen}>
+            <DialogTrigger className="flex items-center justify-between h-9 bg-[#e2e2f5] hover:text-[#e2e2f5] hover:cursor-pointer hover:bg-[#5855eb] text-[#0f0f1a] font-[SF-Pro-Bold] px-4 rounded-lg transition-all duration-200 hover:shadow-lg">
               <Plus className="h-4 w-4 mr-2" />
               Create
             </DialogTrigger>
@@ -166,7 +230,7 @@ const Urls = () => {
         </div>
       </div>
 
-      {urls && urls.length > 0 && (
+      {urls && urls.length > 0 ? (
         <Table className="w-full rounded-lg bg-[#1a1a2e] border border-[#303060] overflow-hidden text-sm">
           <TableHeader>
             <TableRow className="bg-[#23233b] text-[#a48fff] border-b border-[#303060]">
@@ -183,6 +247,7 @@ const Urls = () => {
               return (
                 <TableRow
                   key={index}
+                  onClick={() => handleItemClick(url)}
                   className="text-[#e2e2f5] border-b border-[#303060] hover:bg-[#2a2a45] transition-colors duration-150"
                 >
                   <TableCell className="font-medium px-4 py-2">
@@ -198,23 +263,63 @@ const Urls = () => {
                   <TableCell className="px-4 py-2">
                     <Copy
                       className="hover:text-[#a48fff] cursor-pointer transition-colors duration-150"
-                      onClick={() => {
+                      onClick={(e) => {
+                        e.stopPropagation();
                         navigator.clipboard.writeText(url.shortUrl),
                           toast.success("Copied to clipboard");
                       }}
                     />
                   </TableCell>
                   <TableCell className="flex justify-end px-4 py-2">
-                    <Delete className="hover:text-[#ff5470] cursor-pointer transition-colors duration-150" />
+                    <AlertDialog
+                      open={deleteModal}
+                      onOpenChange={setDeleteModal}
+                    >
+                      <Delete
+                        onClick={(e) => {
+                          e.stopPropagation(), setDeleteModal(true);
+                        }}
+                        className="hover:text-[#ff5470] cursor-pointer transition-colors duration-150"
+                      />
+                      <AlertDialogContent className="bg-[#1a1a2e] text-[#e2e2f5]">
+                        <AlertDialogHeader>
+                          <AlertDialogTitle>
+                            Are you absolutely sure?
+                          </AlertDialogTitle>
+                          <AlertDialogDescription>
+                            This action cannot be undone. This will permanently
+                            delete your url and remove your analytics data of
+                            this url from our servers.
+                          </AlertDialogDescription>
+                        </AlertDialogHeader>
+                        <AlertDialogFooter>
+                          <AlertDialogCancel
+                            onClick={(e) => e.stopPropagation()}
+                          >
+                            Cancel
+                          </AlertDialogCancel>
+                          <AlertDialogAction
+                            className="bg-[#e2e2f5] hover:text-[#e2e2f5] hover:cursor-pointer hover:bg-[#ff5470] text-[#0f0f1a] font-[SF-Pro-Bold] px-6 py-2 rounded-lg transition-all duration-200 hover:shadow-lg"
+                            onClick={(e) => {
+                              e.stopPropagation(), handleDeleteUrl(url._id);
+                            }}
+                          >
+                            Continue
+                          </AlertDialogAction>
+                        </AlertDialogFooter>
+                      </AlertDialogContent>
+                    </AlertDialog>
                   </TableCell>
                 </TableRow>
               );
             })}
           </TableBody>
         </Table>
+      ) : (
+        <p className="text-white font-['SF-Pro-Bold'] text-center">
+          No Urls found
+        </p>
       )}
     </div>
   );
-};
-
-export default Urls;
+}

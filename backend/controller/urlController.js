@@ -4,6 +4,7 @@ const { nanoid } = require("nanoid");
 const useragent = require("useragent");
 const Analytics = require("../models/Analytics");
 const redisClient = require("../config/redis");
+const { isValidObjectId, default: mongoose } = require("mongoose");
 
 const createShortUrl = async (req, res) => {
   const { originalUrl, customAlias, topic } = req.body;
@@ -31,9 +32,11 @@ const createShortUrl = async (req, res) => {
     });
 
     await newUrl.save();
-    res
-      .status(201)
-      .json({ success: true, shortUrl: newUrl.shortUrl, originalUrl: newUrl.originalUrl });
+    res.status(201).json({
+      success: true,
+      shortUrl: newUrl.shortUrl,
+      originalUrl: newUrl.originalUrl,
+    });
   } catch (err) {
     res.status(500).json({ message: "Server error", error: err.message });
   }
@@ -42,18 +45,25 @@ const createShortUrl = async (req, res) => {
 const getAllUrls = async (req, res) => {
   const userId = req.user._id;
 
-  try {    
+  try {
     const userUrls = await Url.find({ userId: userId });
-  
-    if (!userUrls.length) {
-      return res.status(404).json({ success: false, message: "No URLs found for the user." });
-    }
-    return res.status(200).json({success: true, message:"Urls fetched successfuly", data: userUrls})
-  } catch (error) {
-    console.log(error)
-    return res.status(500).json({ success: false, message: "Error fetching urls for the user" });
-  }
 
+    if (!userUrls.length) {
+      return res
+        .status(404)
+        .json({ success: false, message: "No URLs found for the user." });
+    }
+    return res.status(200).json({
+      success: true,
+      message: "Urls fetched successfuly",
+      data: userUrls,
+    });
+  } catch (error) {
+    console.log(error);
+    return res
+      .status(500)
+      .json({ success: false, message: "Error fetching urls for the user" });
+  }
 };
 
 const redirectShortUrl = async (req, res) => {
@@ -104,14 +114,10 @@ const getAnalyticsData = async (req, res) => {
     const cachedAnalytics = await redisClient.get(`analytics:${shortUrlId}`);
     if (cachedAnalytics) {
       console.log("Cache hit");
-      return res.json(JSON.parse(cachedAnalytics));
+      return res.json({ success: true, ...JSON.parse(cachedAnalytics) });
     }
 
     const records = await Analytics.find({ shortUrlId: shortUrlId });
-
-    await redisClient.set(`analytics:${shortUrlId}`, JSON.stringify(records), {
-      EX: 3600,
-    });
 
     if (!records) {
       return res
@@ -177,12 +183,21 @@ const getAnalyticsData = async (req, res) => {
         return acc;
       }, {});
 
-    res.json({
+    const payload = {
       totalClicks,
       uniqueClicks,
       clicksByDate,
       osType: osTypeFormatted,
       deviceType: deviceTypeFormatted,
+    };
+
+    await redisClient.set(`analytics:${shortUrlId}`, JSON.stringify(payload), {
+      EX: 3600,
+    });
+
+    res.status(200).json({
+      success: true,
+      ...{ ...payload },
     });
   } catch (err) {
     console.error(err);
@@ -346,11 +361,38 @@ const getOverallAnalytics = async (req, res) => {
   }
 };
 
+const deleteShortUrl = async (req, res) => {
+  const { urlId } = req.params;
+
+  function ObjectIdCheck(urlId) {
+    if (isValidObjectId(urlId)) {
+      return urlId;
+    }
+    return mongoose.Types.ObjectId(urlId);
+  }
+
+  try {
+    const url = await Url.findByIdAndDelete(ObjectIdCheck(urlId));
+
+    if (!url) {
+      res.status(404).json({ success: false, message: "URL not found" });
+    }
+
+    res
+      .status(200)
+      .json({ success: false, message: "Message deleted successfully" });
+  } catch (error) {
+    console.log(error);
+    res.status(500).json({ success: false, message: "Failed deleting url" });
+  }
+};
+
 module.exports = {
   redirectShortUrl,
   createShortUrl,
   getAnalyticsData,
   getTopicAnalytics,
   getOverallAnalytics,
-  getAllUrls
+  getAllUrls,
+  deleteShortUrl,
 };
