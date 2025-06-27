@@ -7,7 +7,7 @@ const session = require("express-session");
 const cors = require('cors')
 
 app.use(cors({
-  origin: 'http://localhost:5173',
+  origin: ['https://url-shortner.vathsa.site', 'https://www.url-shortner.vathsa.site'],
   credentials: true
 }))
 
